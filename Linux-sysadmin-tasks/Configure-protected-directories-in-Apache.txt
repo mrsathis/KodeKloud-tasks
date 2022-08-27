@@ -1,0 +1,37 @@
+Configure protected directories in Apache
+
+Question:
+
+xFusionCorp Industries has hosted several static websites on Nautilus Application Servers in Stratos DC. There are some confidential directories on document root that need to be password protected. Because they are using Apache for hosting the websites, the production support team has decided to use .htaccess with basic auth. There is a website that needs to be uploaded to /var/www/html/devops on Nautilus App Server 1. However, we need to set up the authentication before that.
+
+
+Create /var/www/html/devops direcotry if doesn't exist.
+
+Add a user javed in htpasswd and set its password to YchZHRcLkL.
+
+There is a file /tmp/index.html placed on Jump Server. Copy the same to new directory you created, please make sure default document root should remain /var/www/html. Also website should work on URL http://<app-server-hostname>:<port>/devops
+
+Answer:
+
+	1  id
+    2  cd /var/www/html/devops
+    3  cd /var/www/html/
+    4  ls -l
+    5  mkdir devops
+    6  ls -l
+    7  cd devops/
+    8  pwd
+    9  sudo htpasswd -c /etc/httpd/.htpasswd javed ==> you will be prompted to enter password.
+   10  sudo systemctl status httpd
+   11  sudo systemctl start httpd
+   12  sudo systemctl restart httpd
+   13  cd /etc/httpd/conf/
+   14  sudo vi httpd.conf 
+   15  cd /var/www/html/devops/
+   16  vi .htaccess
+   17  cd /tmp/
+   18  ls -l
+   19  mv index.html /var/www/html/devops/
+   20  curl -u javed http://localhost:8080/devops
+   21  curl -u javed http://localhost:8080/devops/index.html ==> the password you set has to be entered.
+   22  history

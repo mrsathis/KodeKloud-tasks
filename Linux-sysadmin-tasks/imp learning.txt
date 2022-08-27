@@ -1,0 +1,53 @@
+
+
+b93fd918f7724a2e96fb1c952de01efb
+
+
+
+ssh osboxes@192.168.0.146
+
+
+
+docker run -d --name=db -e POSTGRES_PASSWORD=mysecretpassword postgres
+
+docker run -d --name=wordpress -p 8085:80 --link db:db wordpress
+
+
+
+
+Services:
+
+ db:
+
+ image: postgres
+
+ environment: POSTGRES_PASSWORD=mysecretpassword
+
+ wordpress:
+
+ image: wordpress
+
+ port:
+  - 8085:80
+
+ link:
+  - db
+
+Version:	'3.0'
+
+
+
+services:
+  db:
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    image: postgres
+  wordpress:
+    image: wordpress
+    links:
+    - db
+    ports:
+    - 8085:80
+version: '3.0'
+
+

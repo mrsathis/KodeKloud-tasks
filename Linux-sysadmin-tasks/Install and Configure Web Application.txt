@@ -1,0 +1,39 @@
+
+Install and Configure Web Application
+
+xFusionCorp Industries is planning to host two static websites on their infra in Stratos Datacenter. The development of these websites is still in -progress, but we want to get the servers ready. The storage server has a shared directory /data that is mounted on each app host under /var/www/html directory. Please perform the following steps to accomplish the task:
+
+
+a. Install httpd package and dependencies on all app hosts.
+
+b. Apache should serve on port 8080 within the apps.
+
+c. There are two website's backups /home/thor/blog and /home/thor/games on jump_host. Set them up on Apache in a way that blog should work on link http://<<lb-url>>/blog/ and games should work on link http://<<lb-url>>/games. (do not worry about load balancer configuration, as its already configured).
+
+d. You can access the website on LBR link; to do so click on the + button on top of your terminal, select the option Select port to view on Host 1, and after adding port 80 click on Display Port.
+
+
+
+yum install -y openssh-clients
+
+systemctl restart sshd
+ 
+yum install -y httpd
+    
+vi /etc/httpd/conf/httpd.conf 
+
+systemctl enable httpd && systemctl start httpd && systemctl status httpd
+
+mv /tmp/games/ /var/www/html
+
+mv /tmp/ecommerce/ /var/www/html/
+
+ll /var/www/html/
+
+curl http://stapp01:8080/ecommerce
+
+curl http://stlb01.stratos.xfusioncorp.com/ecommerce
+
+
+
+

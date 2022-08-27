@@ -1,0 +1,98 @@
+Install and Configure HaProxy LBR
+
+Question:
+
+There is a static website of Nautilus project running in Stratos Datacenter. Based on the infrastructure, they have already configured app servers and code is already deployed there. To make it work properly, they need to configure LBR server. There are number of options for that, but team has decided to go with HAproxy.
+
+
+a. So install and configure HAproxy on LBR server using yum only and make sure all app servers are added to HAproxy load balancer. HAproxy must serve on default http port (Note: Please do not remove stats socket /var/lib/haproxy/stats entry from haproxy default config.).
+
+b. You can access the website on LBR link—to do so click on the + button on top of your terminal, select option Select port to view on Host 1, and after adding port 80 click on Display Port.
+
+
+Answer:
+
+On Each App Server:
+
+[root@stapp01 tony]# cat /etc/httpd/conf/httpd.conf | grep Listen
+# Listen: Allows you to bind Apache to specific IP addresses and/or
+# Change this to Listen on specific IP addresses as shown below to 
+#Listen 12.34.56.78:80
+Listen 3004
+[root@stapp01 tony]# systemctl enable httpd && service httpd start && service httpd status
+Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service.
+Redirecting to /bin/systemctl start httpd.service
+Redirecting to /bin/systemctl status httpd.service
+● httpd.service - The Apache HTTP Server
+   Loaded: loaded (/usr/lib/systemd/system/httpd.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2021-04-04 15:46:27 UTC; 4min 45s ago
+     Docs: man:httpd(8)
+           man:apachectl(8)
+ Main PID: 395 (httpd)
+   Status: "Total requests: 0; Current requests/sec: 0; Current traffic:   0 B/sec"
+   CGroup: /docker/aeffcb79e9064294e92f128398112ebf58016876cba0bce8ff6baccdc76ebe32/system.slice/httpd.service
+           ├─395 /usr/sbin/httpd -DFOREGROUND
+           ├─396 /usr/sbin/httpd -DFOREGROUND
+           ├─397 /usr/sbin/httpd -DFOREGROUND
+           ├─398 /usr/sbin/httpd -DFOREGROUND
+           ├─399 /usr/sbin/httpd -DFOREGROUND
+           └─400 /usr/sbin/httpd -DFOREGROUND
+
+Apr 04 15:46:27 stapp01.stratos.xfusioncorp.com systemd[1]: Starting The Apache HTTP Server...
+Apr 04 15:46:27 stapp01.stratos.xfusioncorp.com httpd[395]: AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using stapp01.stratos.xfusioncorp.com. Set t...this message
+Apr 04 15:46:27 stapp01.stratos.xfusioncorp.com systemd[1]: Started The Apache HTTP Server.
+Hint: Some lines were ellipsized, use -l to show in full.
+
+
+====
+
+In LBR
+
+[root@stlb01 loki]# history
+    1  yum -y install haproxy
+    2  cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bkp
+    3  cat /etc/haproxy/haproxy.cfg | grep haproxy/stat
+    4  vi /etc/haproxy/haproxy.cfg
+
+
+#---------------------------------------------------------------------
+# main frontend which proxys to the backends
+#---------------------------------------------------------------------
+frontend  main *:80
+    acl url_static       path_beg       -i /static /images /javascript /stylesheets
+    acl url_static       path_end       -i .jpg .gif .png .css .js
+
+    use_backend static          if url_static
+    default_backend             app
+
+#---------------------------------------------------------------------
+# static backend for serving up images, stylesheets and such
+#---------------------------------------------------------------------
+backend static
+    balance     roundrobin
+    server      static 127.0.0.1:4331 check
+
+#---------------------------------------------------------------------
+# round robin balancing between the various backends
+#---------------------------------------------------------------------
+backend app
+    balance     roundrobin
+    server  app1 172.16.238.10:3004 check
+    server  app2 172.16.238.11:3004 check
+    server  app3 172.16.238.12:3004 check
+
+
+
+    5  cat /etc/haproxy/haproxy.cfg | grep haproxy/stat
+    6  haproxy -f /etc/haproxy/haproxy.cfg
+    7  systemctl enable haproxy && service haproxy start & service haproxy status
+    8  service haproxy status
+    9  curl 172.16.238.12:3004
+   10  curl 172.16.238.11:3004
+   11  curl 172.16.238.10:3004
+   12  curl 172.16.238.14:3004
+   13  curl 172.16.238.14:80
+   14  curl 172.16.238.14:5000
+   15  history
+[root@stlb01 loki]# 
+

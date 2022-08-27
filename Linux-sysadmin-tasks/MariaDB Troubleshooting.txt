@@ -1,0 +1,29 @@
+MariaDB Troubleshooting
+
+Question:
+
+There is a critical issue going on with the Nautilus application in Stratos DC. The production support team identified that the application is unable to connect to the database. After digging into the issue, the team found that mariadb service is down on the database server.
+
+
+Look into the issue and fix the same.
+
+
+Answers:
+
+    1  systemctl status mariadb
+    2  systemctl start mariadb
+    3  cd /var/log/mariadb/
+    4  ls -l
+    5  tail -f mariadb.log 
+    6  cat mariadb.log 
+    7  journalctl -xe
+    8  grep 'mariadb' journalctl -xe
+    9  journalctl -xe | grep 'mariadb'
+   10  cd /var/lib/
+   11  ls -l
+   12  chown mysql:mysql mysql/
+   13  systemctl start mariadb
+   14  systemctl status mariadb
+   15  systemctl enable mariadb
+   16  ls -l /var/log/mariadb/
+   17  cat /var/log/mariadb/mariadb.log 

@@ -1,0 +1,41 @@
+Linux Nginx as Reverse Proxy
+
+Question:
+
+Nautilus system admin's team is planning to deploy a front end application for their backup utility on Nautilus Backup Server, so that they can manage the backups of different websites from a graphical user interface. They have shared requirements to set up the same; please accomplish the tasks as per detail given below:
+
+
+a. Install Apache Server on Nautilus Backup Server and configure it to use 5004 port (do not bind it to 127.0.0.1 only, keep it default i.e let Apache listen on server's IP, hostname, localhost, 127.0.0.1 etc).
+
+b. Install Nginx webserver on Nautilus Backup Server and configure it to use 8093.
+
+c. Configure Nginx as a reverse proxy server for Apache.
+
+d. There is a sample index file /home/index.html on Jump Host, copy that file to Apache's document root.
+
+e. Make sure to start Apache and Nginx services.
+
+f. You can test final changes using curl command, e.g curl http://<backup server IP or Hostname>:8093.
+
+
+Answer:
+
+
+	1  sudo yum install httpd -y
+    2  sudo yum install epel-release
+    3  sudo yum install nginx -y
+    4  cd /etc/httpd/conf/
+    5  sudo vi httpd.conf 
+    6  sudo systemctl status httpd
+    7  sudo systemctl restart httpd
+    8  sudo systemctl status httpd
+    9  cd /etc/nginx/
+   10  sudo vi nginx.conf
+   11  sudo systemctl status nginx
+   12  sudo systemctl restart nginx
+   13  sudo systemctl status nginx
+   14  cd /tmp
+   15  ls -l
+   16  cp index.html /var/www/html/
+   17  sudo cp index.html /var/www/html/
+   18  curl http://172.16.238.16:8093

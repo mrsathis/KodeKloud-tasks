@@ -1,0 +1,31 @@
+
+Configure Local Yum repos
+
+Question:
+
+The Nautilus production support team and security team had a meeting last month in which they decided to use local yum repositories for maintaing packages needed for their servers. For now they have decided to configure a local yum repo on Nautilus Backup Server. This is one of the pending items from last month, so please configure a local yum repository on Nautilus Backup Server as per details given below.
+
+
+a. We have some packages already present at location /packages/downloaded_rpms/ on Nautilus Backup Server.
+
+b. Create a yum repo named localyum and make sure to set Repository ID to localyum. Configure it to use package's location /packages/downloaded_rpms/.
+
+c. Install package httpd from this newly created repo.
+
+Answers:
+
+1  cd /packages/downloaded_rpms/
+    2  ls -l
+    3  pwd
+    4  cd /etc/yum.repos.d/
+    5  ls -l
+    6  sudo yum install httpd -y
+    7  ls -l
+
+   13  cd yum.repos.d/
+   14  ls -l
+   15  sudo vi localyum.repo
+   16  ls -l
+   17  sudo yum clean all
+
+   19  sudo yum install httpd -y

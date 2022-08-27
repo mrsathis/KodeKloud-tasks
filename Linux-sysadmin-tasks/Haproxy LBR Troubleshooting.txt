@@ -1,0 +1,49 @@
+Haproxy LBR Troubleshooting
+
+Question: 
+
+xFusionCorp Industries has an application running on Nautlitus infrastructure in Stratos Datacenter. The monitoring tool recognised that there is an issue with the haproxy service on LBR server. That needs to fixed to make the application work properly.
+
+
+Troubleshoot and fix the issue, and make sure haproxy service is running on Nautilus LBR server.
+
+Answer:
+
+At first login to Load Balancer Server > ssh loki@stlb01   Mischi3f
+
+Then check haproxy configuration status > sudo haproxy -c -f /etc/haproxy.haproxy.cfg
+
+If your configuration is not correct, then you can get this kind of message
+
+I fixed the clients typo and made it client
+
+
+
+Then start the haproxy service
+
+sudo systemctl start haproxy
+sudo systemctl enable haproxy
+sudo systemctl status haproxy
+
+
+systemctl status haproxy
+
+haproxy -c -f /etc/haproxy/haproxy.cfg 
+
+vi /etc/haproxy/haproxy.cfg 
+
+vi /etc/haproxy/haproxy.cfg 
+
+systemctl start haproxy
+
+systemctl status haproxy
+
+systemctl stop haproxy
+
+haproxy -c -f /etc/haproxy/haproxy.cfg 
+
+vi /etc/haproxy/haproxy.cfg 
+
+systemctl start haproxy
+
+systemctl status haproxy

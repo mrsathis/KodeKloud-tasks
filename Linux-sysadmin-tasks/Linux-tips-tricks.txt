@@ -1,0 +1,56 @@
+Linux Tips
+==========
+
+
+For tar commands - http://www.linfo.org/tar.html
+
+https://docs.microsoft.com/en-in/windows/win32/msi/orca-exe?redirectedfrom=MSDN is an editor for MSI files.
+
+Script (Linux) / Start-transcript (Powershell)
+
+http://manpages.ubuntu.com/manpages/bionic/man1/script.1.html
+
+================================================================================================
+
+NTP - Network Time Protocol 
+
+NTP Server (Local NTP Server / Public NTP Server)
+
+Proxy Servers
+
+DNS - Maps human understandable names to IP addresses.
+
+New computer uses DNS by the router u connected too. (your ISP's DNS Server)
+
+================================================================================================
+
+Accessing web server content:
+
+1. buy a domain name from a Domain registrars (Godaddy.com / blueHost.com)
+2. website files point to this domain name
+3. localhost (/etc/hosts) always queried first to check if any entries exist
+4. Bind or PowerDNS software for DNS (https://blog.dnsimple.com/2015/02/top-dns-servers/)
+
+ISP's DNS Resolver >> Root name server >> Name server for .com >> Name server for example.com 
+
+DHCP wont use static IP addresses. DHCP Servers assigns dynamic IP address from the range it has configured and with given Gateway and subnet range it has configured.
+
+================================================================================================
+ 
+  
+apt - advanced package tool
+yum -YelloDog Updater
+
+vsftpd package => ftp package
+
+$lftp <hostname> 
+
+**lftp ftp client program
+
+$ sudo service vftpd reload => without interupting the existing session and the changes effect for the new connections.
+
+cups - spool service in unix
+
+
+
+

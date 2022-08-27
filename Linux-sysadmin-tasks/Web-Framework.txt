@@ -1,0 +1,130 @@
+Web-Framework
+=============
+
+Browser sends a Request and Server returns a Response.
+
+Server runs "Server side code" which listens the user requests. => Java, NodeJS, Python
+
+Client (Browsers) sends a request and recieves the reponse runs "Client side code" => Javascript, CSS, HTML
+
+Both are developed together
+
+Apache (8080), nginx (80), Glassfish (8000) are some of the web hosting servers.
+
+Static Website:
+
+- Serves static web content
+- No interaction to webserver after the content served
+- Apache http & nginx are type of static web servers
+- They called as web servers
+
+Dynamic Websites
+
+- Serves mixed of static and dynamic content
+- Apache tomcat, gunicorn, uwsgi are type of web servers
+- because it serves dynamic content each time, these are called application servers.
+
+APACHE Web Server (HTTP)
+========================
+
+- Opensource webserver
+- Serves web content in CSS, HTML, Javascript
+- used as conjunction in serving webcontent when backend is Apache tomcat
+- It available in most of the Linux distribution repos
+- yum install -y httpd
+- service start/status/stop httpd
+- firewall-cmd --permanent --add-service=http (when we have firewall, add a rule to allow HTTP traffic)
+- For log, /var/log/httpd/access_log => whenever user access the server || /var/log/httpd/error.log => when there is an error
+
+- For config file, which stores the port it listens, webcontent path, SSL and HTTPS details etc under /etc/httpd/conf/httpd.conf
+
+- Dafault port - 80
+
+- You can host more than one webserver on Apache and the logical division of this is called "virtualhost"
+
+- Document root should have this division like "/var/www/html" ==> "/var/www/website1" & "/var/www/website2" in the config file.
+
+- 	<VirtualHost *:80>
+		ServerName www.website1.com
+		DocumentRoot /var/www/website1
+	</VirtualHost>
+	
+
+	<VirtualHost *:80>
+		ServerName www.website2.com
+		DocumentRoot /var/www/website2
+	</VirtualHost>	
+
+- every cofig change needs a service restart "service restart httpd"
+
+- apache intelligent enough to differentiate the content path by reading the website entered by the user.
+
+- What if we have multiple websites to be configured? add
+
+		Include conf/website1.conf
+		Include conf/website2.conf
+
+
+APACHE TOMCAT SERVER
+====================
+
+- Provides webserver environment for Java based web applications
+
+- So, as a pre-requisite Java must have installed. "yum install -y java-1.8.0-openjdk-devel"
+
+- Download the apache file from apache site "wget https://downloads.apache.org/tomcat/tomcat-8/v8.5.53/bin/apache-tomcat-8.5.53.tar.gz"
+
+- tar xvf apache-tomcat-8.5.53.tar.gz
+
+- start "./apache-tomcat-8.5.53/bin/startup.sh"
+
+- Default port : 8080
+
+- Capable of hosting multiple java web applications
+
+- directory /bin will have the startup and evironment config files.
+
+- directory /conf will have the "server.xml" which is has connector config like the port it listens to and the change in this file needs a restart.
+
+- directoty /webapps is the place from where you host web application
+
+- sudo sed -i 's/8080/9090/g' /opt/apache-tomcat-8/conf/server.xml;
+
+
+Python Web Framworks
+====================
+
+- django & flask most widely used framework in python.
+
+Nodejs
+======
+
+first run "npm install" - will install all the dependecy files defined in the package.json in source code
+
+To run the app, execute "node" command with app starting point like "app.js"
+
+Supervisord, forever, pm2 are tools to prevent the node to shutdown when app crashes.
+
+It is not a practice to run node commands in production and one of the above tools will be used for production like app. pm2 is a production grade process manager for Node.js applications with builtin LB
+
+you can run "pm2 start app.js" after the pm2 installation
+
+"pm2 start app.js -i 4" will start the app in 4 process mode (clusters)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

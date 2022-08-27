@@ -1,0 +1,79 @@
+Linux Network Services
+
+Question:
+
+Our monitoring tool has reported an issue in Stratos Datacenter. One of our app servers has an issue, as its Apache service is not reachable on port 3000 (which is our Apache port). The service itself could be down, the firewall could be at fault, or something else could be causing the issue.
+
+
+Use tools like telnet, netstat, etc. to find and fix the issue. Also make sure Apache is reachable from the jump host without compromising any security settings.
+
+Answer;
+
+	52  ip address show
+   53  grep -i 'ServerName' /etc/httpd/conf/httpd.conf 
+   54  httpd -t
+   55  vi /etc/httpd/conf/httpd.conf 
+   56  service httpd start
+   57  systemctl status httpd
+   58  exit
+   59  sudo iptables -I INPUT -p tcp -m tcp --dport 3000 -j ACCEPT
+   60  sudo iptables-save > /etc/sysconfig/iptables
+   61  sudo iptables --list
+   62  systemctl status httpd
+
+----------
+On 10th May
+-----------
+
+
+   sudo curl 172.16.238.10:6300
+    2  sudo curl 172.16.238.11:6300
+    3  sudo curl 172.16.238.12:6300
+
+
+
+    [root@stapp01 tony]# systemctl start httpd
+Job for httpd.service failed because the control process exited with error code. See "systemctl status httpd.service" and "journalctl -xe" for details.
+[root@stapp01 tony]# 
+[root@stapp01 tony]# 
+[root@stapp01 tony]# 
+[root@stapp01 tony]# systemctl status -l httpd
+● httpd.service - The Apache HTTP Server
+   Loaded: loaded (/usr/lib/systemd/system/httpd.service; disabled; vendor preset: disabled)
+   Active: failed (Result: exit-code) since Sun 2021-05-09 18:32:45 UTC; 12s ago
+     Docs: man:httpd(8)
+           man:apachectl(8)
+  Process: 404 ExecStop=/bin/kill -WINCH ${MAINPID} (code=exited, status=1/FAILURE)
+  Process: 403 ExecStart=/usr/sbin/httpd $OPTIONS -DFOREGROUND (code=exited, status=1/FAILURE)
+ Main PID: 403 (code=exited, status=1/FAILURE)
+
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com httpd[403]: AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using stapp01.stratos.xfusioncorp.com. Set the 'ServerName' directive globally to suppress this message
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com httpd[403]: (98)Address already in use: AH00072: make_sock: could not bind to address 0.0.0.0:6300
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com httpd[403]: no listening sockets available, shutting down
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com httpd[403]: AH00015: Unable to open logs
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com systemd[1]: httpd.service: main process exited, code=exited, status=1/FAILURE
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com kill[404]: kill: cannot find process ""
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com systemd[1]: httpd.service: control process exited, code=exited status=1
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com systemd[1]: Failed to start The Apache HTTP Server.
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com systemd[1]: Unit httpd.service entered failed state.
+May 09 18:32:45 stapp01.stratos.xfusioncorp.com systemd[1]: httpd.service failed.
+
+
+
+
+systemctl start httpd
+   50  systemctl status -l httpd
+   51  cat /etc/httpd/conf/httpd.conf | grep Listen
+   52  cat /etc/httpd/conf/httpd.conf | grep ServerName
+   53  vi /etc/httpd/conf/httpd.conf 
+   54  cat /etc/httpd/conf/httpd.conf | grep ServerName
+   55  systemctl start httpd
+   56  netstat -anp |grep LISTEN |grep ":6300"
+   57  kill 328
+   58  netstat -anp |grep LISTEN |grep ":6300"
+   59  systemctl start httpd
+   60  ststemctl enable httpd
+   61  systemctl enable httpd
+   62  systemctl status -l httpd
+   63  iptables -I INPUT -p tcp --dport 6300 -j ACCEPT
+   64  service iptables save

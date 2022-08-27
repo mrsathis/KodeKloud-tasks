@@ -1,0 +1,70 @@
+
+Linux Banner Update
+
+During the monthly compliance meeting, it was pointed out that several servers in the Stratos DC do not have a valid banner. The security team has provided serveral approved templates which should be applied to the servers to maintain compliance. These will be displayed to the user upon a successful login.
+
+
+Update the message of the day on all application and db servers for Nautilus. Make use of the approved template located at /home/thor/nautilus_banner on jump host
+
+##########################################################################################################################################################
+
+thor@jump_host ~$ sudo scp -r nautilus_banner tony@stapp01:/home/tony
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for thor: 
+The authenticity of host 'stapp01 (172.16.238.10)' can't be established.
+ECDSA key fingerprint is SHA256:aB54kIQ/pnmKkeASg7Y7cUlKgRnvu3inAnUBTr6SSDc.
+ECDSA key fingerprint is MD5:9f:54:90:60:58:b2:41:6e:ae:60:68:a0:45:04:d0:ed.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'stapp01,172.16.238.10' (ECDSA) to the list of known hosts.
+tony@stapp01's password: 
+nautilus_banner                                                           100% 2531     2.5MB/s   00:00    
+
+
+##########################################################################################################################################################
+
+sudo scp -r nautilus_banner tony@stapp01:/home/tony
+
+ssh tony@stapp01
+
+Ir0nM@n
+
+sudo mv nautilus_banner /etc/motd
+
+
+sudo scp -r nautilus_banner steve@stapp02:/home/steve
+
+ssh steve@stapp02
+
+Am3ric@
+
+sudo mv nautilus_banner /etc/motd
+
+
+
+sudo scp -r nautilus_banner banner@stapp03:/home/banner
+
+ssh banner@stapp03
+
+BigGr33n
+
+sudo mv nautilus_banner /etc/motd
+
+
+sudo scp -r nautilus_banner peter@stdb01:/home/peter
+
+ssh peter@stdb01
+
+Sp!dy
+
+sudo mv nautilus_banner /etc/motd
+
+
+**UNABLE TO COPY FILE INTO DB SERVER SO , I LOGIN TO DBSERVER AND I INSTALLED (sudo yum install openssh-clients -y)
+

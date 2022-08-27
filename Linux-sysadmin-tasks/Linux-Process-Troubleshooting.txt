@@ -1,0 +1,44 @@
+Linux Process Troubleshooting
+
+Question:
+
+The production support team of xFusionCorp Industries has deployed some of the latest monitoring tools to keep an eye on every service, application, etc. running on the systems. One of the monitoring systems reported about Apache service unavailability on one of the app servers in Stratos DC.
+
+
+Identify the faulty app host and fix the issue. Make sure Apache service is up and running on all app hosts. They might not hosted any code yet on these servers so you need not to worry about if Apache isn't serving any pages or not, just make sure service is up and running. Also, do not try to change the Apache port on any host.
+
+Answers:
+
+You’ll need to perform apache checks on all three app servers
+
+1. ssh into the app server
+
+ssh “user”@”servername”
+
+2. Check the status of the httpd service and try starting it
+
+sudo systemctl status httpd; sudo systemctl start httpd
+
+3. Check for the port running httpd from the config file
+
+sudo vi /etc/httpd/conf/httpd.conf
+4. Install net-tools
+
+sudo yum install -y net-tools
+
+5. Check what other process is using the same port as apache and run the kill command
+
+
+sudo netstat -anp | grep LISTEN
+
+sudo netstat -anp | grep “port”
+
+sudo kill -9 “pid_number”
+
+6. Restart httpd
+
+sudo systemctl restart httpd
+
+7. CHechk if the apache syntax is correct
+
+httpd -t

@@ -1,0 +1,69 @@
+
+IP Address
+==========
+
+- Each Network interface in a host gets its IP address assigned.
+
+- Each of this network interface divided into multiple components known as ports.
+
+- We can have upto 65535 ports in an ip address and each ports is an communication end point.
+
+=====
+
+Databases:
+==========
+
+MySQL(3306), Postgres(5432) - 2 top SQK DB's.
+
+MongoDB (27017), redis, DynamoDB are NoSQL DB's
+
+
+
+
+Asymmetric Encryption
+=====================
+
+1. User access the Server using HTTPS
+2. Server sends the "Public key" to the User.
+3. Now the user's browser encrypts the "public key" with the symmetric key (private key)
+4. Server decrypt the transferred message with the private key and retrieve the symmetric key.
+5. User can encrypt the message now with the symmetric key and server has the key the decrypt it.
+
+
+
+cd /etc/httpd/csr/
+
+openssl req -new -newkey rsa:2048 -nodes -keyout app01.key -out app01.csr
+
+cd /etc/httpd/certs/
+
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout app01.key -out app01.crt
+
+echo | openssl s_client -showcerts -servername app01.com -connect app01:443 2>/dev/null | openssl x509 -inform pem
+
+
+
+YAML:
+======
+
+- Key Value Pair
+
+Fruit: Apple
+Vegetable: Carrot
+
+- Array/Lists
+
+Fruits:
+-	Orange
+-	Apple
+
+- Dictionary/Map
+
+Banana:
+	Calories: 105
+	Fat: 0.4 g
+
+
+LAMP Stack - Linux Apache MySQL Php
+
+

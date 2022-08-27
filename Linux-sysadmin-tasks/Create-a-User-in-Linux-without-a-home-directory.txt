@@ -1,0 +1,11 @@
+Create a User in Linux without a home directory
+
+The system admins team of xFusionCorp Industries has set up a new tool on all app servers, as they have a requirement to create a service user account that will be used by that tool. They are finished with all apps except for App 3 in Stratos Datacenter.
+
+
+Create a user named john in App Server 3 without a home directory.
+
+1. sudo useradd -M john
+
+2. getent passwd | grep john
+

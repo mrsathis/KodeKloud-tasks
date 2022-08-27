@@ -1,0 +1,19 @@
+Linux firewalld rules
+
+Question:
+
+The Nautilus system admins team recently deployed a web UI application for their backup utility running on the Nautilus backup server in Stratos Datacenter. The application is running on port 5004. They have firewalld installed on that server. The requirements that have come up include the following:
+
+
+Open all incoming connection on 5004/tcp port. Zone should be public.
+
+Answer:
+
+	sudo systemctl status firewalld
+    sudo firewall-cmd --zone=public --list-all
+    sudo firewall-cmd --zone=public --list-ports
+    sudo firewall-cmd --permanent --zone=public --add-port=6300/tcp
+    sudo firewall-cmd --reload
+    sudo systemctl restart firewalld
+    sudo firewall-cmd --zone=public --list-all
+    sudo firewall-cmd --zone=public --list-ports
