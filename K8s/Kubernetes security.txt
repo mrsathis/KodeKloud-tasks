@@ -1,0 +1,72 @@
+Kubernetes security:
+~~~~~~~~~~~~~~~~~~~~
+
+- as part security primitive, controlling access to kube-api server
+
+who can access? and What they can do?
+
+- who can access the API Server decided by authendication mechanism.
+
+- There are different ways, that you can authendicate to the API Server.
+
+	1. User IDs and passwords - stored in static files
+	2. username and tokens - stored in static files
+	3. Certificates
+	4. External authendication providers - LDAP
+	5. Service accounts - for machines
+
+- Once they authendicated, what they can do defined by authorization mechanism
+
+- authorization is implemented using Role Based Access control (RBAC).
+
+	- users associated to groups with specific permission.
+
+other authorization modules are,
+
+	- Attribute based access control (ABAC)
+	- Node Authorizers
+	- webhook mode
+
+- All the communication between all the components, agents, controllers etc is using TLS Encryption
+
+Authendication:
+~~~~~~~~~~~~~~~
+
+- End users, who access the deployed apps in a cluster managed by the app themselves internally.
+
+- Users >> human access like admin or developer
+
+- Service accounts >> bots, or other processes/services or application that requires access to cluster
+
+- kubernetes does not natively manage the user creation or user account management and relies on external sources like files, tokens, certificates, third party idp like LDAP.
+
+- service accounts can be created and managed
+
+- all user access is managed by api server, either its from the kubectl utility or through an API directly.
+
+- kube-api server authendicates the user before procesing the request.
+
+How does the kube-api server authendicates?
+
+- There are different authendication mechanism that can be configured.
+
+	1. User IDs and passwords - stored in static files
+	2. username and tokens - stored in static files
+	3. Certificates
+	4. External authendication providers - LDAP
+
+** please note basic auth like username/password, or username/token is deprecated in 1.19 and not supported in the latest.
+
+- also, it is not supported in production grade applications
+
+TLS Certificates:
+~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+
+
+

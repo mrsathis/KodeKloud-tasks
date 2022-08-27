@@ -1,0 +1,11 @@
+metadata:
+  labels:
+    run: messaging
+    tier: msg
+  name: messaging
+  namespace: default
+spec:
+  containers:
+  - image: redis:alpine
+    imagePullPolicy: IfNotPresent
+    name: messaging

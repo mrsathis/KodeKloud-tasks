@@ -1,0 +1,76 @@
+YAML:
+=====
+
+- To Store different properties of a single object is called "Dictionary"
+
+Dictionary:
+~~~~~~~~~~~
+
+color: grey
+model: hyundai
+transmission: MT
+price: 1000000
+
+Dictionary in Dictionary:
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+color: grey
+model: 
+  name: hyundai
+  year: 2016
+transmission: MT
+price: 1000000
+
+- when multiple items of the same type of objects, then its called List/Array.
+
+List/Array:
+~~~~~~~~~~~
+
+- blue hyundai
+- red hyundai
+- grey hyundai
+- white hyundai
+
+List of Dictionaries:
+~~~~~~~~~~~~~~~~~~~~~
+
+- color: blue
+  model: 
+    name: hyundai
+    year: 2016
+  transmission: MT
+  price: 1000000
+
+- color: red
+  model: 
+    name: hyundai
+    year: 2017
+  transmission: MT
+  price: 1100000
+
+- color: grey
+  model: 
+    name: hyundai
+    year: 2016
+  transmission: MT
+  price: 1000000
+
+- color: white
+  model: 
+    name: hyundai
+    year: 2016
+  transmission: MT
+  price: 1200000
+
+
+Dictionary - are Unordered
+
+- properties of the value can be in different orders in the dictionaries and the values should be same.
+
+List - are Ordered
+
+- properties in different places in the two different lists aren't same.
+
+
+
+

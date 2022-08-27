@@ -1,0 +1,39 @@
+Container Network namespace Interface: CNI
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Set of standards to develop programs to work with network challenges by container runtime.
+
+-  CNI defines, how plugins to be developed and how runtime will invoke them.
+
+- CNI plugins.
+
+- Bridge, vlan, ipvlan, macvlan, windows and DHCP, host-local
+
+- third party plugins like, weaveworks, flannel, cilium, VmwareNSX, infoblox etc.
+
+- docker does not implement CNI
+
+- it has its own standards called, CNM (container network model)
+
+- In kubernetes, docker container created with none network and bridge plugin invoked to add the container id to the network namespace
+
+Ports of master node and worker node:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Master Node:
+
+- kube-api server - 6443
+- kubelet - 10250
+- kube-scheduler - 10251
+- kube-controller-manager - 10252
+- etcd - 2379
+
+- for multiple master nodes: additionally open the port "2380" for etcd client to communicate
+
+- Worker Node:
+
+- kubelet - 10250
+- Services - ranges from 30000 to 32767
+
+
+

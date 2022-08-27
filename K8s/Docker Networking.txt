@@ -1,0 +1,41 @@
+Docker Networking:
+~~~~~~~~~~~~~~~~~~
+
+None:
+~~~~~
+- container cannot connect any network and no one connect this container
+
+- docker run --network none nginx
+
+Host:
+~~~~~
+
+- Container created with host shares the same network of host.
+
+- There is no network isolation between host and container.
+
+- docker run --network host nginx
+
+- If a container hosts a web application on port 80 of host, then similar application on containers on the same host can't use that port.
+
+Bridge:
+~~~~~~~
+
+- Internal private network gets created in the host.
+
+- The default network ip address is 172.17.0.0 and the ceach device or containers connecting to this bridge gets its own ip address from this network.
+
+How is this bridge network created in Docker?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Once docker gets installed, it installs the internal private network called bridge in the host.
+
+- Inside the container, it installs as bridge and can be seen in >> docker network ls
+
+- In host it will show as "docker0" and to check this docker network from the host use command >> ip link and it will show the network interface as "docker0"
+
+- during the install, docker runs the command, ip link add docker0 type bridge 
+
+- Whenever the container gets created, network namespace for the container gets created.
+
+

@@ -1,0 +1,137 @@
+
+
+
+
+1.List all persistent volumes sorted by capacity(or name), saving the full kubcet1 output in text file path (given in exam)
+kubectl get pv --sort-by='.spec.capacity.storage'
+kubectl get pv --sort-by='.metadata.name'
+
+2.create single instance of pod on every node (i.e. daemonset). do not alter taints on node.
+
+3.Create a deployment as follows  
+    • Name nginx-app  
+    • Using container nginx with version 1.11.10-alpine  
+    • The deployment should contain 3 replicas  
+    Next, deploy the application with new version 1.13.0-alpine, by performing a rolling update,  
+    and record that update  
+    Finally, rollback that update to the previous version 1.11.10-alpine
+	
+4. Create and configure the service front-end-service so its accessible through ClusterIP and routes to the existing pod named front-end.  
+
+5.Scale the deployment webserver to 3 pods.
+
+6.Check to see how many nodes are ready (not including nodes tainted Noscheduel) and write the number to file name_of_file_given_in_question
+kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINT:.spec.taints[*].effect | grep -v NoSchedule
+
+7.find pods running high CPU workloads and write the name of the pod consuming most CPU to the file name_of_file_given_in_question
+kubectl top pod --sort-by=cpu
+kubectl top pod --sort-by=memory 
+kubectl top pod --sort-by=cpu --all-namespaces  ----> if name-sapce is not given than only use --all-namespace
+kubectl top pod --all-namespaces | sort --reverse --key 3 --numeric | head -3
+
+8. Create a deployment as follows  
+    • Name nginx-random  
+    • Exposed via a service nginx-random  
+    • Ensure that the service & pod are accessible via their respective DNS records  
+    • The container(s) within any pod(s) running as a part of this deployment should use the nginx image  
+    Next,use the utility nslookup to look up the DNS records of the Service & pod and write the output to optservice.dns and optservice.dns respectively.  
+
+kubectl exec busybox -- nslookup service_name >> optservice.dns
+kubectl exec busybox -- nslookup 10-0-1-2.default.pod >> optservice.dns
+
+    
+9. take backup of etcd cluster save it to some file.  
+ETCDCTL_API=3 etcdctl snapshot save mysnapshot.db --endpoints=https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key
+
+
+10.A kubernetes worker node is in state NotReady Investigate why this is the case, and perform any appropriates steps to bring the node to a Ready state.
+
+
+
+11. Configure the kubelet system- managed service (i.e. static pod), on mentioned worker node. details of pod name will be given in exam  
+
+
+
+
+12. you need to setup k8s cluster of 1 master and 1 worker node using kubeadm tool, kubeadm.config file will be given using this file you need to initialized master node.
+ssh master
+
+
+
+
+
+
+13. Give a partially- functioning Kuberenetes cluster, identify symptoms of failure on the cluster. in my case kubernetes api server was not running need to find out issue and fix it
+
+
+
+14. create persistentvolume using hostpath specification given in question
+
+
+
+15. need to add init container in given pod specification file, this init container will create some file
+
+
+
+
+16. Set the node named worker node01 as unavailable and reschedule all the pods running on it.
+kubectl drain node01 --ignore-daemonsets
+
+
+17. Volumes
+    Create a pod as following details:
+	•	Name:non-persistent-redis
+	•	Container image: redis
+	•	Name-volume with name: cache-control
+	•	Mount path: /data/redis
+	•	It should launch in the qa namespace and the volumes must not be persistent. 
+      
+18. Create a Kubernetes secret as follows  
+    • Name super-secret
+    • credential mouse
+    Create a pod named pod-secrets-via-file, using the redis image, which mounts a secret  
+    named super-secret at secrets.  
+    Create a second pod named pod-secrets-via-env, using the redis image, which exports  
+    credential as 
+	
+	
+19. Create a pod named kucc8 single app conatiner with ( 1 and 4 instances)
+  
+    NGINX+REDIS+MEMCACHED+CONSUL
+	
+    1.Create deployment with 3 container
+    2. Scal up to 4 pod...
+	kubectl create deployment test1 --image=nginx,redis,memcached
+	kubectl scale deployment test1 --replicas=4
+	
+20. Create a deployment with given replicas no and store the it in a yaml file
+
+
+21. Create a file /opt/KUCC00302/kucc00302.txt that lists all pods in the front-end-service in the production namespace.
+kubectl -n production get svc svc1 --show-labels
+kubectl -n production get pods --selector="app_env_stage=dev" > /opt/KUCC00302/kucc00302.txt
+
+
+
+2. List all persistent volumes sorted by name(not capacity here) saving the full kubcet1 output in text file path (given in exam)
+
+8. create a pod 
+  Name: Nginx
+  image: nginx
+  namespace: my-website
+
+14. Scale the deployment guestbook to 5.
+
+16. create a pod 
+    Name: some name
+	image: redis
+	label: disk=spinning
+	
+
+20 Create a deployment spec file (file name will be given in exam)
+   Name: some name
+   image: nginx
+   label: app-rutime_stage=prod nginx 
+   replicas = 3
+
+18. Create a file /opt/KUCC00302/kucc00302.txt that lists all pods in the front-end-service in the production namespace.

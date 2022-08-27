@@ -1,0 +1,255 @@
+JSON PATH:
+~~~~~~~~~~
+
+- JSON Path is a Query language to parse the data in JSON/Yaml format
+
+- When query applied to the given JSON dataset, it returns the subset of that data. For example,
+
+- JSON PATH - Dictionaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+How do you query dictionaries of data in JSON Path?
+
+Data:
+~~~~~
+
+{
+	"cars":  {
+
+	  "color": "blue"
+	  "price": "10000"
+	}
+
+}
+
+Query:
+~~~~~~
+
+car >> query to get car details
+
+Result:
+~~~~~~~
+
+{
+	
+	"color": "blue"
+	"price": "10000"
+}
+
+when you want a specific field of it? like the color of the car.
+
+Query:
+~~~~~~
+
+$.car.color >> . (dot notation) will help you select a particular field in a dictionary.
+
+- "$" is the root element in JSON.
+
+- Output of the JSON Path query will result within a square bracket '[]'
+
+- Dictionary dataset starts with {} curly braces and should be denoted with dot notation.
+
+- JSON PATH - Lists
+~~~~~~~~~~~~~~~~~~~
+
+How do you query a List/array of data in JSON Path?
+
+- first element in this is square bracket []
+- indexes starts from 0
+- always start with "$" symbol as root element
+- number insde the square bracket denotes the position of the dataset
+
+Data:
+~~~~~
+
+[
+	"car"
+	"bus"
+	"truck"
+	"bike"
+]
+
+
+Query:
+~~~~~~
+
+$[0]  >> query to list the 1st element
+
+$[3]  >> query to list the 4th element
+
+$[0, 3] >> query to list 1st and 4th element
+
+Result:
+~~~~~~~~
+
+[ "car" ]
+
+[ "bike" ]
+
+[ "car", "bike" ]
+
+
+- JSON PATH - Dictionary & Lists
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- mixed of dictionary and array data set to be queried.
+
+Data:
+~~~~~
+
+
+Query:
+~~~~~~
+
+$.car.wheels[1].model
+
+>> "$" is the root element
+
+>> "dot" notation to represent the dictionary starts with curly braces
+
+>> "car" is the dictionary
+
+>> "wheels" is an array has model and location properties are dictionary
+
+>> "[1]" this query to get the second model of the wheels, hence the index number is 1 with in square brackets
+
+>> ".model" represents that dataset again a dictionary
+
+
+Result:
+~~~~~~~
+
+
+- JSON Path - criteria
+~~~~~~~~~~~~~~~~~~~~~~
+
+Why do you need to have criteria?
+
+- Query based on a criteria, like query a number from the list, which is greater than some number
+
+
+Query:
+~~~~~~
+
+Get all number greater than 40
+
+- $ [ check if each item in the list/array > 40 ]
+
+- for, check if >> denote, ? ()
+
+- Hence, $ [ ? ( each item in the list > 40 ) ]
+
+- for "each item in the list" denoted by @
+
+- so the final query is, $ [ ? ( @ > 40 ) ]
+
+What if the dataset queried in different order? (person entered the data in different order in DB for other items)
+
+- as this query can't be used always, $.car.wheels[2].model
+
+- $.car.wheels[?(@.location == "rear-right")].model >> query the each item in the dictionary of car and an array of wheel to match with the "location = "rear-right" wheels model.
+
+
+JSON PATH - wildcard (Advanced querying)
+~~~~~~~~~~~~~~~~~~~~~
+
+How do you get all the colors? as we have color property for both car and bus.
+
+- $.*.color >> * operator used to denote all or any object in a dictionary.
+
+How does the same operator used in a list/array?
+
+- $[*].model >> star operator denoted with in the square bracket for list/array object
+
+- How do you query a object in a list of dictionary and the dictionary in a list?
+
+- $.car.wheels[0].model >> queries a first model of a wheel in a car
+
+- $.car.wheels[*].model >> queries any/all model of a wheel in a car
+
+- $.*.wheels[*].model >> queries any/all model of a wheel of any/all object (like both car,bus and truck)
+
+How do you query the particular position of a element in a list?
+
+- $[0] >> queries the first element in the list
+
+- $[0, 3] >> queries first and fourth element in the list
+
+- $[0:3] >> queries from first to fourth but will resturn only the first, second and third element from the list.
+
+- So, $[0:4] >> will query first to fifth but will return first, second, third and fourth element from the list.
+
+- $[0:8:2] >> query the element from first to eight but returns the second element of each from the list like [1, 3, 5, 7]
+
+- $[-1:0] or [-1:] >> queries the last element from the list, as the last element indexed always -1.
+
+- $[-3:] >> queries the element of last three.
+
+
+Why JSON Path? In kubernetes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- In an large enterprise kubernetes setup (like prod), querying large data sets is easier in json path.
+
+- kubectl CLI queries the kube-api server always returns in jsonpath format and it converted internally to the human readable format.
+
+How do you use jsonpath in kubectl?
+
+- 4 steps.
+
+	1. Identify the kubectl command == kubectl get nodes, kubectl get pods
+ 	
+ 	2. Familiarize with JSON output == kubectl get nodes -o json
+	
+	3. Form the JSON PATH query == understand the structure of the jsonpath query. == .items[0].spec.containers[0].image
+	
+	4. use the jsonpath query with kubectl command == kubectl get nodes -o=jsonpath='{.items[0].spec.containers[0].image}' >> always encapsulates the jsonpath query in kubectl command with-in a single quote curly braces.
+
+** Do evaluate the query in jsonpath.com and put it in kubectl command
+
+
+- kubectl get nodes -o=jsonpath='{.items[*].metadata.name}' >> queries only the node name of the first object
+
+- kubectl get nodes -o=jsonpath='{.items[*].metadata.name} {.items[*].status.capacity.cpu}'  >> queries multiples items of the object
+
+- {"\n"} for new line, {"\t"} for new tab
+
+Loops - Range
+~~~~~~~~~~~~~
+
+FOR EACH NODE
+	
+	PRINT NODE NAME \t PRINT CPU COUNT \n
+
+END FOR
+
+===
+
+'{range .items[*]}
+
+	{.metadata.name} {"\t"} {.status.capacity.cpu} {"\n"}
+
+{end}'
+
+===
+
+put this jsonpath in kubectl command:
+
+kubectl get nodes -o=jsonpath='{range .items[*]} {.metadata.name} {"\t"} {.status.capacity.cpu} {"\n"} {end}'
+
+
+Custom Columns:
+~~~~~~~~~~~~~~~
+
+- It is easier approach than the loops and ranges
+
+- kubectl get nodes -o=custom-columns=<column name>:<json path>
+
+- additional columns separated by , comma
+
+JSON PATH for SORT:
+~~~~~~~~~~~~~~~~~~~
+
+- using --sort-by= option to sort the property in kubectl command
+
+

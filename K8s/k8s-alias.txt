@@ -1,0 +1,26 @@
+
+
+
+Set alias for all the commands
+
+kubectl get nodes > kgn
+kubectl get pods > kgp
+
+kubectl describe pods > kdp
+kubectl describe nodes > kdn
+kubectl describe deployments > kdd
+kubectl describe svc > kds
+
+
+
+
+
+
+kubectl get nodes --all-namespaces --no-headers -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints[*].effect | grep -v NoSchedule | wc -l > filename
+
+kubectl top pods --all-namespaces --sort-by=cpu -l <labelname> | awk '{print $2}' > filename
+
+
+
+
+

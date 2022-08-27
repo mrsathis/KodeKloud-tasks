@@ -1,0 +1,21 @@
+
+
+
+kubectl commands:
+~~~~~~~~~~~~~~~~~
+
+Backup-Restore:
+~~~~~~~~~~~~~~~
+
+kubectl get all --all-namespaces -o yaml > all-deploy-svcs.yaml >> command to extract all pods, deployments, services from all the namespaces extracted to a yaml file.
+
+
+
+
+
+
+
+
+
+
+

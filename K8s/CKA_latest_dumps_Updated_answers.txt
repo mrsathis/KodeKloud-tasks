@@ -1,0 +1,632 @@
+
+
+QA1 : You have been asked to create new "ClusterRole" for a deployment pipeline and bind it to a specific ServiceAcccount
+scoped to a specific namespace.
+
+Task:
+
+create a new ClusterRole named "depployment-clusterrole" which only allows  to create the follwing resource types.
+
+   * Deployment
+   * StatefulSet
+   * DaemonSet
+Create a new serviceAccount named "cicd-token" in the existing namespace "app-team1".
+
+Bind the new clusterrole "deployment-clusterrole" to the new ServiceAccount "cicd-token" , limited to the namespace "app-team1"
+
+
+Answer:  
+
+#kubectl create serviceaccount cicd-token --namespace app-team1
+
+#kubectl create clusterrole deployment-clusterrole --verb=create --resource=deployments,daemonset,statefulset --dry-run=client -o yaml > sa.yaml
+
+#cat sa.yaml //verify
+
+#kubectl create clusterrolebinding deployment-clusterrole-binding --clusterrole=deployment-clusterrole
+ --serviceaccount=app-team1:cicd-token
+
+#kubectl get clusterrolebinding -n app-team1
+
+=========================================================================================================
+
+QA2: Set the node named "ek8s-node-o" as unavailable and reschedule all the pods running on it.
+
+Answer: 
+
+#kubectl drain ek8s-node-o --ignore-daemonsets --force
+
+#kubectl cordon ek8s-node-o
+
+==========================================================================================================
+
+QA3: Given an existing kubernetes cluster running version 1.18.8, upgrade all of the kubernetes control plane and node 
+components on the master node only to the version 1.19.0.
+
+ you are also expected to upgrade "kubelet and kubectl " on the master node.
+
+note: Be sure to drain the master node before upgrade it.
+
+Answer: you need to login master node and perform this step in exam.
+
+#kubectl get nodes  // check the master node name
+
+#ssh masternode
+
+1. On master node:
+
+#apt update
+#apt-cache madison kubeadm
+
+  //find the latest 1.19 version in the list
+  //it should look like 1.19.x-00, where x is the latest patch
+
+#apt-mark unhold kubeadm && \
+#apt-get update && apt-get install -y kubeadm=1.19.x-00 && \
+#apt-mark hold kubeadm
+
+
+#kubeadm version  //verify the version
+
+#kubectl drain <cp-node-name> --ignore-daemonsets  //drain the controlplane node (master node)
+
+#kubeadm upgrade plan
+
+#kubeadm upgrade apply v1.19.0
+#kubectl uncordon <masternode>
+
+Upgrade additional control plande node :
+#kubeadm upgrade node
+
+Upgrade kubectl and kubelet :
+
+# replace x in 1.19.x-00 with the latest patch version
+apt-mark unhold kubelet kubectl && \
+apt-get update && apt-get install -y kubelet=1.19.x-00 kubectl=1.19.x-00 && \
+apt-mark hold kubelet kubectl
+-
+# since apt-get version 1.1 you can also use the following method
+apt-get update && \
+apt-get install -y --allow-change-held-packages kubelet=1.19.x-00 kubectl=1.19.x-00
+
+#sudo systemctl daemon-reload
+#sudo systemctl restart kubelet
+
+
+2. on worker node:
+
+# replace x in 1.19.x-00 with the latest patch version
+apt-mark unhold kubeadm && \
+apt-get update && apt-get install -y kubeadm=1.19.x-00 && \
+apt-mark hold kubeadm
+-
+# since apt-get version 1.1 you can also use the following method
+apt-get update && \
+apt-get install -y --allow-change-held-packages kubeadm=1.19.x-00
+
+Drain the node 
+# kubectl drain <node-to-drain> --ignore-daemonsets
+
+#kubeadm upgrade node  //upgrade the kubelet config 
+
+upgrade kubelet and kubectl :
+
+#apt-mark unhold kubelet kubectl
+#apt-get update && apt-get install -y kubelet=1.19.x-00 kubectl=1.19.x-00 
+#apt-mark hold kubelet kubectl
+-
+# since apt-get version 1.1 you can also use the following method
+#apt-get update 
+#apt-get install -y --allow-change-held-packages kubelet=1.19.x-00 kubectl=1.19.x-00
+
+Restart the kubelet 
+
+#sudo systemctl daemon-reload
+#sudo systemctl restart kubelet
+
+#kubectl uncordon <node-to-drain>
+
+Verify the cluster :
+
+#kubectl get nodes
+
+===========================================================================================================
+
+QA4: First , create  snapshot of the existing etcd instance running at https://127.0.0.1:2379 saving the snapshot to
+/var/lib/backup/etcd-snapshot.db.
+
+Next restore as existing previous snapshot located at /var/lib/backup/etcd-snapshot-previous.db
+
+cacert: /ca.cert
+clientcert:/client.cert
+client key: /client.key
+
+Answer: 
+
+#ETCDCTL_API=3 etcdctl version
+
+#ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379  --cacert=/ca.cert --cert=/client.crt --key=client.key member list
+
+ETCDCTL_API=3 etcdctl --endpoints=https:https://127.0.0.1:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt --key=/etc/kubernetes/pki/etcd/server.key memberlist
+
+#ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379  --cacert=/ca.cert --cert=/client.crt --key=client.key snapshot save /var/lib/backup/etcd-snapshot.db
+
+Verify the backup:
+
+#ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379  --cacert=/ca.ce --cert=/client.crt --key=client.key snapshot status /var/lib/backup/etcd-snapshot.db -w table  
+
+Restore from previuous backup:
+
+#sudo su -
+#chmod 777 /var/lib/backup/etcd-snapshot-previous.db
+#ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379  --cacert=/ca.ce --cert=/client.crt --key=client.key snapshot restore /var/lib/backup/etcd-snapshot-previous.db
+
+
+
+
+=============================================================================================================
+
+QA5: Create a network policy named "allow-port-from-namespace" that allows pods in the existing namespace "my-app" to connect to port 9000 of other pods in the same namespace.
+
+Ensure that the new Networkpolicy:
+ 
+*Doesnot allow access to pods not listening on port 9000
+*Doesnot allow access from pods not in namespace my-app.
+
+
+vi netpol.yaml 
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-port-from-namespace
+  namespace: my-app
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: my-app
+    ports:
+    - protocol: TCP
+      port: 9000
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: my-app
+    ports:
+    - protocol: TCP
+      port: 9000
+
+
+#kubectl create -f netpol.yaml
+
+#kubectl get netpol 
+#kubectl describe netpol allow-port-from-namespace
+
+
+==================================================================================================================
+
+QA6: Reconfigure the existing deployment front-end and add a port specification named http exposing port 80/tcp of the 
+existing container nginx.
+
+create a new service named "front-end-svc" exposing the container port "http".
+
+Configure the new service to also expose the individual pods via a NodePort on the nodes on which they are scheduled.
+
+Answer: 
+
+#kubectl get deployment front-end -o yaml > dep.yaml
+
+Check and modify the container port as 80 / tcp. 
+
+#kubectl delete deployment front-end
+#kubectl apply -f dep.yaml
+
+or 
+
+#kubectl edit deployment/front-end 
+
+and modify the container ports and tcp protocol. 
+
+
+#kubectl expose deployment front-end --name front-end-svc --type NodePort --port 80 --target-port 80 --dry-run -o yaml > srv.yaml 
+
+#vi srv.yaml 
+
+ports: 
+- port: 80
+  protocol: http
+  targetPort: 80
+  nodePort: 30082 
+selector: 
+
+#kubectl apply -f srv.yaml 
+
+#kubectl describe service front-end-svc // verify the end points and ports 
+
+===================================================================================================================
+
+QA7: Create a new nginx "ingress" resource as follows:
+
+1. name : ping 
+2.Namespace : ing-internal
+3. Exposing service "hi" on path "/hi" using service port 5678.
+
+The availability of service hi can be checked using the following command. which should return hi:
+
+#curl -kL <INTERNAL_IP> /hi 
+
+
+Answer:
+
+Ref the url :https://kubernetes.io/docs/concepts/services-networking/ingress/
+
+#vi ingress.yaml
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ping
+  namespace: ing-internal
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /hi
+        pathType: Prefix
+        backend:
+          service:
+            name: hi
+            port:
+              number: 5678
+
+#kubectl create -f ingress.yaml 
+
+#kubectl get ingress ping 
+
+#curl -kL <INTERNAL_IP>/hi 
+
+
+
+
+====================================================================================================================
+
+QA8: Scale the deployment loadbalancer to 6 pods.
+
+Answer: 
+
+#kubectl scale --replicas=6 deployment/loadbalancer
+
+#kubectl get deployment loadbalancer
+
+=====================================================================================================================
+
+QA9: Schedule a pod as follows:
+
+1.Name: nginx-kusc00401
+2.Image: nginx
+3.Node Selector : disk=spinning 
+
+1.Get the node name which is labeled as "disk=spinning"
+#kubectl get nodes --show-labels
+#kubectl get nodes --show-labels |grep "disk=spinning"
+
+
+2.kubectl run generator=run-pod/v1 nginx-kusc00401 --image=nginx --dry-run=client -o yaml >pod.yaml
+
+#vi pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-kusc00401
+spec:
+  containers:
+  - name: nginx-kusc00401
+    image: nginx
+  nodeSelector:
+    disk: spinning
+
+#kubectl create -f pod.yaml
+
+#kubectl get pods nginx-kusc00401 -o wide  //ensure the pod is running on specified node
+
+
+
+======================================================================================================================
+
+QA10: Check to see how many nodes are ready (not including nodes tainted Noschedule) and write the number to 
+ /opt/KUSC00402/kusc00402.txt.
+
+Answer: 
+
+Note: They asked to write the number of nodes into the file. So u need to get the count and enter. no need to capture the name.
+
+#kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINT:.spec.taints[*].effect | grep -v NoSchedule 
+#kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINT:.spec.taints[*].effect --no-headers| grep -v NoSchedule|wc -l > /opt/KUSC00402/kusc00402.txt
+
+
+#kubectl describe nodes
+#cat /opt/KUSC00402/kusc00402.txt   // verify the number of nodes only should get entered in the file.
+
+
+======================================================================================================================
+
+QA11: Create a pod named "kucc1" with a single app container for each of the following images running inside (there may be between 1 and 4 images specified).
+
+ nginx+redis + memcached 	
+
+Answer:
+
+#kubectl run --generator=run-pod/v1 kucc1 --image=nginx --dry-run=client -o yaml > multipod.yaml
+
+#vi multipod.yaml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kucc1
+spec:
+  
+  containers:
+  - name: 1st
+    image: nginx
+    
+  - name: 2nd
+    image: redis
+
+  - name: 3rd
+    image: memcached	
+	
+
+======================================================================================================================
+
+QA12 : Create a persistent volume with the name "app-data" of capacity 2Gi and access mode "ReadWriteMany". the type of volume is "hostPath" and its location is /"srv/app-data". 
+
+
+Answer: 
+
+#vi pv.yaml
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: app-data
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /srv/app-data
+
+#kubectl create -f pv.yaml 
+
+#kubectl get pv //verify the answer 
+
+
+
+
+======================================================================================================================
+
+QA13: Create a new PersistentVolumeClaim
+
+1. name: pv-volume
+2.class: csi-hostpath-sc
+3.capacity : 10Mi
+
+Create a new pod which mounts the PersistentVolumeClaim as a volume:
+
+1.name : web-server
+2.image: nginx 
+3.mount path : /usr/share/nginx/html 
+
+configure new pod to have ReadWriteOnce access on the volume. Finally using kubectl edit or < missing this part >>>>>>> 
+
+
+
+Answer:
+
+1. Get the pv details 
+#kubectl describe pv < task-pv-volume>
+
+2. create pvc using the template from the page - https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+
+vi pvc.yaml
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pv-volume
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 10Mi
+  storageClassName: csi-hostpath-sc
+  selector:
+    matchLabels:
+      prod: "dev"  << check and change from exiting pv labels>
+
+3. Create pvc 
+   #kubectl create -f pvc.yaml
+
+4. verify the pv status 
+
+#kubectl get pv /// it should be in bound status 
+
+
+5.create pod 
+
+#kubectl run --generator=run-pod/v1 web-server --image=nginx --dry-run-client -o yaml > po.yaml
+
+#vi po.yaml 
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-server
+spec:
+  containers:
+    - name: web-server
+      image: nginx
+      volumeMounts:
+      - mountPath: "/usr/share/nginx/html"
+        name: pv-volume
+  volumes:
+    - name: pv-volume << name from exiting pv>
+      persistentVolumeClaim:
+        claimName: pv-volume  
+
+#kubectl create -f po.yaml
+
+#kubcetl describe pod web-server
+
+
+Modify the pvc size using patch commmand :
+=============================================
+
+
+#kubectl patch pvc mysql-pv-claim -p '{ "spec": { "resources": { "requests": { "storage": "6Gi" }}}}'
+
+
+
+=========================================================================================================================
+
+QA14: Monitor the logs of Pod "bar" and :
+
+1. Extract log lines corresponding to error "file-not-found"
+2. write them to /opt/KUTR00101/bar.
+
+Answer: 
+
+kubectl logs bar |grep "file-not-found" > /opt/KUTR00101/bar
+
+=========================================================================================================================
+
+QA15: Without changing existing containers as existing pod needs to be integrated into kubernetes's built-in logging architecture. (e.g kubectl logs). Adding a streaming sidecar container is a good and common way to accomplish this requirement. 
+
+Task: 
+
+Add a busybox sidecar container to the existing pod "legacy-app". the new sidecar container has to run the follwing 
+command :  "/bin/sh -c tail -n+1 /var/log/legacy-app.log"
+
+use a Volume named to "logs" to make the file "/var/log/legacy-app.log" available to the side container.
+
+note: Dont modify the existing container
+      dont modify the path of the log file both containers must access. 
+
+
+
+Answer: 
+
+#kubectl get pods legacy-app -o yaml > multi-container.yaml
+
+#vi multi-container.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: multi-cont-pod
+  name: multi-cont-pod
+spec:
+  volumes:
+  - name: logs
+    emptyDir: {}
+  containers:
+  - image: busybox
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do echo 'Hi I am from Main container' >> /var/log/index.html; sleep 5;done"]
+    name: main-container
+    resources: {}
+    volumeMounts:
+    - name: logs
+      mountPath: /var/log
+  - image: busybox
+    name: sidecar-container
+    args: [/bin/sh, -c, 'tail -n+1 -f /var/log/legacy-app.log']
+    resources: {}
+    ports:
+      - containerPort: 80
+    volumeMounts:
+    - name: logs
+      mountPath: /var/log/
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+status: {}
+
+
+#kubectl create -f multi-container.yaml
+
+#kubectl get pods legacy-app
+
+Verify the answer :
+
+// exec into main container
+#kubectl exec -it  legacy-app -c main-container -- sh
+  cat /var/log/legacy-app.log
+
+// exec into sidecar container
+#kubectl exec -it  legacy-app -c sidecar-container -- sh
+  cat /var/log/legacy-app.log 
+
+
+// install curl and get default page
+#kubectl exec -it  leagacy-app -c sidecar-container -- sh
+  # apt-get update && apt-get install -y curl
+  # curl localhost  
+
+===========================================================================================================================
+
+QA16: From the pod label "name-cpu-utilizer" find pods running high CPU workloads and write the name of the pod 
+consuming most CPU to the file /opt/KUTR00401/KUTR00401.txt ( which already exist).
+
+
+Answer: 
+
+#kubectl top pod --sort-by=cpu --all-namespaces  -l name-cpu-utilizer 
+#kubectl top pod --sort-by=cpu --all-namespaces  -l name-cpu-utilizer | sort --reverse --key 3 --numeric | head -3 |awk '{ print $2 }' > /opt/KUTR00401/KUTR00401.txt
+
+
+
+
+===========================================================================================================================
+
+QA17: A kubernetes worker node named "wk8s-node-0 is in state "NotReady". Investigate why this is the case and perform any 
+appropriate steps to bring the node to a Ready state, ensuring that any changes are made permanent. 
+
+note: you can ssh to the failed node using " ssh wk8s-node-0.
+
+
+Answer: 
+
+#ssh wk8s-node-o
+
+#sudo su - 
+
+#systemctl status kubelet
+#systemctl start kubelet 
+
+#systemctl enable kubelet 
+#systemctl is-enabled kubelet // verify the service is enabled to run during booting
+
+on Master node
+
+#kubectl get nodes // check the node status 
+
+
+
+============================================================================================================================
+
+
+
